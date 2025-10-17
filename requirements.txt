@@ -1,24 +1,17 @@
-livekit-agents
-livekit-plugins-openai
-livekit-plugins-silero
-livekit-plugins-google
-livekit-plugins-noise-cancellation
-mem0ai
-duckduckgo-search
-langchain_community
-requests
-python-dotenv
+# Core API (Railway only)
 fastapi>=0.111.0
 uvicorn[standard]>=0.30.0
-livekit>=0.12.0
-slowapi>=0.1.9  # Rate limiting
-# Supabase and Auth dependencies
+python-dotenv
+requests
+
+# Auth & Database
 supabase>=2.3.0
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 python-multipart>=0.0.6
-# PDF processing
-PyPDF2>=3.0.1
-pdfplumber>=0.10.0
-# Vector embeddings
-sentence-transformers>=2.2.2
+
+# Rate limiting
+slowapi>=0.1.9
+
+# LiveKit API only (no agent/plugins)
+livekit>=0.12.0
