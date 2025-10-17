@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعلم  جمل بسيطة - SCI</title>
+    
+    <!-- الخطوط والأيقونات -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="client.css">
+    
+    <!-- LiveKit Client - UMD version -->
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.4/dist/livekit-client.umd.min.js"></script>
+    
+    <style>
+        /* تعديلات خاصة بصفحة الجمل */
+        .sentences-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .sentences-info {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .sentence-display {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid #667eea;
+        }
+        
+        .sentence-english {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .sentence-arabic {
+            font-size: 1.1em;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+        
+        .sentence-pronunciation {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- الحاوية الرئيسية -->
+    <div class="main-container">
+        <!-- القسم الرئيسي للتحكم -->
+        <div class="control-section">
+            <!-- العنوان الرئيسي -->
+            <div class="sentences-header">
+                <h1>📚 تعلم جمل إنجليزية </h1>
+                <p>تحدث مع Friday وتعلم النطق الصحيح</p>
+            </div>
+
+            <!-- معلومات المستخدم -->
+            <div class="control-card">
+                <div class="user-info-row">
+                    <div class="user-info" id="userInfo">مرحباً بك!</div>
+                    <div>
+                        <button id="backBtn" class="btn btn-secondary" style="margin-left: 10px;">
+                            <i class="fas fa-arrow-right"></i> العودة
+                        </button>
+                        <button id="signoutBtn" class="btn btn-danger">🚪 تسجيل الخروج</button>
+                    </div>
+                </div>
+            </div>
+
+     
+            <!-- إعدادالاتصال -->
+            <div class="control-card">
+                <!-- حقل اسم الغرفة مخفي -->
+                <input id="room" type="hidden" value="sentences-room">
+                
+                <div class="input-row">
+                    <div class="input-group" style="flex: 1; max-width: 100%;">
+                        <label for="name">اسمك</label>
+                        <input id="name" type="text" placeholder="أدخل اسمك">
+                    </div>
+                </div>
+
+                <!-- أزرار التحكم -->
+                <div class="controls-row">
+                    <button id="joinBtn" class="btn btn-primary">
+                        <i class="fas fa-microphone"></i>
+                        بدء تعلم الجمل
+                    </button>
+                    <button id="leaveBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-phone-slash"></i>
+                        إنهاء التعلم
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- بطاقة المحادثة -->
+        <div class="chat-card">
+            <div class="chat-header">
+                <h3><i class="fas fa-comments"></i> المحادثة مع Friday</h3>
+            </div>
+
+            <!-- منطقة الرسائل -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    <div class="message-header">
+                        <span><i class="fas fa-robot"></i> Friday</span>
+                        <span>•</span>
+                        <span>مدرس الإنجليزية</span>
+                    </div>
+                    <div class="message-content">
+                        مرحبا بك
+                    </div>
+                </div>
+            </div>
+
+            <!-- مؤشر الكتابة -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- النسخ المباشر -->
+            <div class="live-transcription" id="liveTranscription">
+                <div class="transcription-text" id="transcriptionText">
+                    <i class="fas fa-microphone-alt"></i>
+                    جاري الاستماع...
+                </div>
+                <div class="transcription-indicator" id="transcriptionIndicator"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Polyfill للمتصفحات القديمة -->
+    <script>
+        // التحقق من دعم dynamic import
+        if (typeof window.import === 'undefined') {
+            console.warn('Dynamic import not supported, adding polyfill');
+        }
+        
+        // التحقق من دعم WebRTC
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            console.error('WebRTC not supported in this browser');
+            alert('هذا المتصفح لا يدعم المحادثات الصوتية. يرجى استخدام Chrome أو Firefox أو Edge الحديث.');
+        }
+    </script>
+    
+    <!-- ملف JavaScript للجمل -->
+    <script src="sentences-client.js"></script>
+    
+    <!-- عنصر الصوت المخفي -->
+    <audio id="audio" autoplay playsinline style="display: none;"></audio>
+</body>
+</html>

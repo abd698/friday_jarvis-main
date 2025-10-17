@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friday - مساعدك الذكي لتعلم الإنجليزية | SCI</title>
+    <meta name="description" content="تعلم اللغة الإنجليزية بطريقة تفاعلية مع Friday AI - محادثات صوتية، 3000 جملة، وبودكاست تعليمي">
+    <meta name="keywords" content="تعلم الإنجليزية, AI, محادثة, Friday, تعليم اللغات">
+    <meta name="author" content="SCI Team">
+    
+    <!-- Open Graph for social media -->
+    <meta property="og:title" content="Friday - مساعدك الذكي لتعلم الإنجليزية">
+    <meta property="og:description" content="تعلم اللغة الإنجليزية بطريقة تفاعلية مع Friday AI">
+    <meta property="og:type" content="website">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Friday AI">
+    
+    <!-- الخطوط والأيقونات -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- LiveKit Client - UMD version (لتجنب مشاكل proxy) -->
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.4/dist/livekit-client.umd.min.js"></script>
+    
+    <!-- ملف CSS منفصل -->
+    <link rel="stylesheet" href="client.css">
+</head>
+<body>
+    <!-- الحاوية الرئيسية -->
+    <div class="main-container">
+        <!-- القسم الرئيسي للتحكم -->
+        <div class="control-section">
+            <!-- العنوان الرئيسي -->
+            <div class="header-card">
+                <h1>🤖 Friday - مساعد تعليم اللغة الإنجليزية</h1>
+                <p>مرحباً بك في نظام SCI للتعلم الصوتي التفاعلي</p>
+            </div>
+
+            <!-- معلومات المستخدم -->
+            <div class="control-card">
+                <div class="user-info-row">
+                    <div class="user-info" id="userInfo">مرحباً بك!</div>
+                    <button id="signoutBtn" class="btn btn-danger">🚪 تسجيل الخروج</button>
+                </div>
+            </div>
+
+            <!-- إعدادات الاتصال -->
+            <div class="control-card">
+                <!-- حقل اسم الغرفة مخفي -->
+                <input id="room" type="hidden" value="sci-room">
+                
+                <div class="input-row">
+                    <div class="input-group" style="flex: 1; max-width: 100%;">
+                        <label for="name">اسمك</label>
+                        <input id="name" type="text" placeholder="أدخل اسمك">
+                    </div>
+                </div>
+
+                <!-- اختيار الصوت -->
+                <div class="voice-selector-container">
+                    <label class="voice-label">🎤 اختر صوت المعلم</label>
+                    <div class="voice-options">
+                        <label class="voice-option voice-option-active" onclick="selectVoice('Aoede', this)">
+                            <input type="radio" name="voice" value="Aoede" checked>
+                            <div class="voice-content">
+                                <div class="voice-icon">👩</div>
+                                <div class="voice-name">صوت أنثى</div>
+                                <div class="voice-subtitle">Aoede</div>
+                            </div>
+                        </label>
+                        <label class="voice-option" onclick="selectVoice('Puck', this)">
+                            <input type="radio" name="voice" value="Puck">
+                            <div class="voice-content">
+                                <div class="voice-icon">👨</div>
+                                <div class="voice-name">صوت ذكر</div>
+                                <div class="voice-subtitle">Puck</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- أزرار التحكم -->
+                <div class="controls-row">
+                    <button id="joinBtn" class="btn btn-primary">
+                        <i class="fas fa-microphone"></i>
+                        بدء المحادثة
+                    </button>
+                    <button id="leaveBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-phone-slash"></i>
+                        إنهاء المحادثة
+                    </button>
+                    <button id="sentences3000Btn" class="btn btn-info">
+                        <i class="fas fa-book"></i>
+                        3000 جملة
+                    </button>
+                    <button id="podcastBtn" class="btn btn-success">
+                        <i class="fas fa-podcast"></i>
+                        البودكاست
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- بطاقة المحادثة -->
+        <div class="chat-card">
+            <div class="chat-header">
+                <h3><i class="fas fa-comments"></i> المحادثة المباشرة</h3>
+            </div>
+
+            <!-- منطقة الرسائل -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    <div class="message-header">
+                        <span><i class="fas fa-robot"></i> Friday</span>
+                        <span>•</span>
+                        <span>مساعد ذكي</span>
+                    </div>
+                    <div class="message-content">
+                        مرحباً! أنا Friday، مساعدك الشخصي لتعليم اللغة الإنجليزية. اضغط على "بدء المحادثة" للبدء!
+                    </div>
+                </div>
+            </div>
+
+            <!-- مؤشر الكتابة -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- النسخ المباشر -->
+            <div class="live-transcription" id="liveTranscription">
+                <div class="transcription-text" id="transcriptionText">
+                    <i class="fas fa-microphone-alt"></i>
+                    جاري الاستماع...
+                </div>
+                <div class="transcription-indicator" id="transcriptionIndicator"></div>
+            </div>
+        </div>
+
+        <!-- 🌟 نموذج جمع الآراء -->
+        <div class="control-card" id="feedbackCard" style="display: none;">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <h3 style="color: rgba(255, 255, 255, 0.95); font-size: 1.3rem; margin-bottom: 0.5rem;">
+                    🌟 ساعدنا في التحسين
+                </h3>
+                <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.95rem;">
+                    ما رأيك في المحادثة؟
+                </p>
+            </div>
+            
+            <!-- تقييم بالنجوم -->
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div class="star-rating" id="starRating">
+                    <i class="fas fa-star" data-rating="1"></i>
+                    <i class="fas fa-star" data-rating="2"></i>
+                    <i class="fas fa-star" data-rating="3"></i>
+                    <i class="fas fa-star" data-rating="4"></i>
+                    <i class="fas fa-star" data-rating="5"></i>
+                </div>
+            </div>
+            
+            <!-- تعليقات -->
+            <div class="input-group" style="margin-bottom: 1rem;">
+                <label for="feedbackText" style="text-align: center;">💬 ملاحظاتك واقتراحاتك</label>
+                <textarea id="feedbackText" rows="4" 
+                    placeholder="شاركنا رأيك... ما الذي أعجبك؟ ما الذي يمكن تحسينه؟"
+                    style="width: 100%; padding: 0.875rem; border-radius: var(--radius-md); 
+                           border: 1px solid rgba(255, 255, 255, 0.2); 
+                           background: rgba(255, 255, 255, 0.12); 
+                           color: rgba(255, 255, 255, 0.95); 
+                           font-family: inherit; font-size: 0.95rem; resize: vertical;
+                           transition: all var(--transition-base);"></textarea>
+            </div>
+            
+            <!-- أزرار -->
+            <div class="controls-row">
+                <button id="submitFeedbackBtn" class="btn btn-success">
+                    <i class="fas fa-paper-plane"></i>
+                    إرسال التقييم
+                </button>
+                <button id="skipFeedbackBtn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    تخطي
+                </button>
+            </div>
+            
+            <!-- رسالة النجاح -->
+            <div id="feedbackSuccess" style="display: none; text-align: center; 
+                 padding: 1rem; margin-top: 1rem; border-radius: var(--radius-md);
+                 background: rgba(67, 233, 123, 0.2); border: 1px solid rgba(67, 233, 123, 0.4);">
+                <i class="fas fa-check-circle" style="color: #4ade80; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                <p style="color: rgba(255, 255, 255, 0.95); font-weight: 600;">
+                    شكراً لملاحظاتك! 🙏
+                </p>
+            </div>
+        </div>
+    </div> <!-- end main-container -->
+
+    <!-- Voice Selection Script -->
+    <script>
+        let selectedVoice = 'Aoede';
+
+        function selectVoice(voiceName, element) {
+            selectedVoice = voiceName;
+            
+            // إزالة active class من جميع الخيارات
+            document.querySelectorAll('.voice-option').forEach(opt => {
+                opt.classList.remove('voice-option-active');
+            });
+            
+            // إضافة active class للخيار المحدد
+            element.classList.add('voice-option-active');
+            
+            // تفعيل radio button
+            element.querySelector('input[type="radio"]').checked = true;
+            
+            console.log('🎤 تم اختيار الصوت:', voiceName);
+        }
+    </script>
+    
+    <!-- ملف JavaScript منفصل -->
+    <script src="client.js"></script>
+    
+    <!-- عنصر الصوت المخفي -->
+    <audio id="audio" autoplay playsinline style="display: none;"></audio>
+</body>
+</html>

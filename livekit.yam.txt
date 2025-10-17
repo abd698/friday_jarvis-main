@@ -1,0 +1,15 @@
+port: 7880
+rtc:
+  port_range_start: 50000
+  port_range_end: 60000
+  use_external_ip: false
+
+keys:
+  mykey: secret-key-12345
+
+logging:
+  level: info
+
+room:
+  auto_create: true
+  empty_timeout: 300

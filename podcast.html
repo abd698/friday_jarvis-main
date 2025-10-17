@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎙️ البودكاست التعليمي - Friday</title>
+    
+    <!-- Cairo Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="client.css">
+    
+    <!-- LiveKit Client - UMD version -->
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.4/dist/livekit-client.umd.min.js"></script>
+    
+    <style>
+        /* 🎙️ Podcast Page - متناغم مع client.css */
+        body {
+            padding: 2rem 1rem;
+        }
+
+        .podcast-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .podcast-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .podcast-header h1 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 0.5rem;
+        }
+        
+        .podcast-header .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        /* 📊 Status - يستخدم control-card من client.css */
+        .status {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* 🎵 Audio Level */
+        .audio-level {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .audio-level-bar {
+            height: 100%;
+            background: var(--gradient-4);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: var(--radius-full);
+        }
+
+        /* 💡 Tips - يستخدم control-card */
+        .tips {
+            text-align: right;
+        }
+
+        .tips h3 {
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .tips ul {
+            color: rgba(255, 255, 255, 0.85);
+            padding-right: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .tips li {
+            margin: 0.5rem 0;
+        }
+
+        /* 🎙️ Transcription - يستخدم control-card */
+        .transcription-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+
+        .transcription-text {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: right;
+            min-height: 50px;
+        }
+
+        /* 💬 Chat Box - يستخدم control-card */
+        .chat-box {
+            border-radius: var(--radius-lg);
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 💬 Chat Messages - بسيط ونظيف */
+        .chat-message {
+            padding: 0.875rem 1rem;
+            margin: 0.75rem 0;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.08);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            border-right: 3px solid var(--primary);
+            text-align: right;
+        }
+
+        .chat-message.assistant {
+            border-left: 3px solid var(--accent);
+            text-align: left;
+        }
+
+        .message-label {
+            font-weight: 600;
+            margin-bottom: 0.375rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .message-content {
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .chat-box-header {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Responsive - client.css يحتوي على الكل */
+        @media (max-width: 768px) {
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .chat-box {
+                max-height: 300px;
+            }
+            
+            .transcription-text {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="podcast-container">
+        <!-- Header -->
+        <div class="header-card podcast-header">
+            <h1>🎙️ English Conversation Practice</h1>
+            <p class="subtitle">
+                تدرّب على محادثات طبيعية بالإنجليزية مع Friday AI
+            </p>
+        </div>
+
+        <!-- Status -->
+        <div class="control-card">
+            <div class="status" id="status">
+                🔴 غير متصل
+            </div>
+        </div>
+
+        <!-- 🎤 النص المباشر -->
+        <div class="control-card">
+            <div class="transcription-header">
+                <i class="fas fa-microphone-alt"></i>
+                <span>النص المباشر</span>
+            </div>
+            <div class="transcription-text" id="transcriptionText">
+                جاري الاستماع...
+            </div>
+            
+            <div class="audio-level">
+                <div id="audioLevelBar" class="audio-level-bar"></div>
+            </div>
+        </div>
+
+        <!-- 💬 سجل المحادثة -->
+        <div class="control-card">
+            <div class="chat-box-header">
+                <i class="fas fa-comments"></i>
+                <span>سجل المحادثة</span>
+            </div>
+            <div class="chat-box" id="chatBox">
+                <div class="chat-message assistant">
+                    <div class="message-label">🤖 Friday</div>
+                    <div class="message-content">
+                        Hello! I'm Friday, your English conversation partner. 
+                        Press "Start Conversation" and let's have a natural English conversation!
+                        <br><br>
+                        مرحباً! أنا Friday، شريكك في محادثات الإنجليزية.
+                        اضغط "بدء المحادثة" ودعنا نتحدث بالإنجليزية!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الأزرار -->
+        <div class="control-card">
+            <div class="controls-row">
+                <button id="startBtn" class="btn btn-success">
+                    <i class="fas fa-microphone"></i>
+                    بدء المحادثة
+                </button>
+                <button id="stopBtn" class="btn btn-danger" disabled>
+                    <i class="fas fa-stop"></i>
+                    إيقاف المحادثة
+                </button>
+                <a href="/client.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    العودة
+                </a>
+            </div>
+        </div>
+
+        <!-- 💡 نصائح -->
+        <div class="control-card tips">
+            <h3>💡 نصائح للمحادثة الفعّالة:</h3>
+            <ul>
+                <li>تحدث بوضوح وبسرعة طبيعية</li>
+                <li>لا تخف من الأخطاء - Friday سيساعدك بلطف</li>
+                <li>اطرح أسئلة واطلب التوضيح عند الحاجة</li>
+                <li>استمتع بالمحادثة وكن طبيعياً</li>
+                <li>يمكنك التحدث عن أي موضوع تريد</li>
+            </ul>
+        </div>
+    </div> <!-- end podcast-container -->
+
+    <script src="podcast-client.js"></script>
+</body>
+</html>

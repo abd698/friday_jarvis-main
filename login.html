@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCI - تعلم الإنجليزية بالذكاء الاصطناعي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            width: 100%;
+            max-width: 950px;
+            min-height: 650px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            position: relative;
+            animation: containerFadeIn 0.8s ease-out;
+        }
+        
+        @keyframes containerFadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3.5rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: orbRotate 15s linear infinite;
+        }
+        
+        @keyframes orbRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features {
+            list-style: none;
+            text-align: right;
+        }
+
+        .features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .features li i {
+            margin-left: 10px;
+            font-size: 1.2rem;
+        }
+
+        .auth-section {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #4facfe;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-right: 4px solid #c33;
+            display: none;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-right: 4px solid #3c3;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+            
+            .welcome-section {
+                padding: 40px 30px;
+            }
+            
+            .auth-section {
+                padding: 40px 30px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- قسم الترحيب -->
+        <div class="welcome-section">
+            <div class="logo">
+                <i class="fas fa-brain"></i> SCI
+            </div>
+            <h1 class="welcome-title">تعلم الإنجليزية بالذكاء الاصطناعي</h1>
+            <p class="welcome-subtitle">
+                منصة تفاعلية لتعلم اللغة الإنجليزية عبر المحادثات الصوتية مع الذكاء الاصطناعي
+            </p>
+            <ul class="features">
+                <li><i class="fas fa-microphone"></i> محادثات صوتية تفاعلية</li>
+                <li><i class="fas fa-chart-line"></i> تقييم مستواك الفوري</li>
+                <li><i class="fas fa-robot"></i> مدرس ذكي متاح 24/7</li>
+                <li><i class="fas fa-trophy"></i> تتبع تقدمك اليومي</li>
+            </ul>
+        </div>
+
+        <!-- قسم تسجيل الدخول -->
+        <div class="auth-section">
+            <div class="auth-tabs">
+                <button class="tab-button active" onclick="switchTab('signin')">تسجيل الدخول</button>
+                <button class="tab-button" onclick="switchTab('signup')">إنشاء حساب</button>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>جاري المعالجة...</p>
+            </div>
+
+            <!-- نموذج تسجيل الدخول -->
+            <form id="signinForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signinEmail">البريد الإلكتروني</label>
+                    <input type="email" id="signinEmail" name="email" required 
+                           placeholder="أدخل بريدك الإلكتروني">
+                </div>
+                <div class="form-group">
+                    <label for="signinPassword">كلمة المرور</label>
+                    <input type="password" id="signinPassword" name="password" required 
+                           placeholder="أدخل كلمة المرور">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> دخول
+                </button>
+            </form>
+
+            <!-- نموذج إنشاء حساب -->
+            <form id="signupForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="signupName">الاسم الكامل</label>
+                    <input type="text" id="signupName" name="full_name" required 
+                           placeholder="أدخل اسمك الكامل">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">البريد الإلكتروني</label>
+                    <input type="email" id="signupEmail" name="email" required 
+                           placeholder="أدخل بريدك الإلكتروني">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">كلمة المرور</label>
+                    <input type="password" id="signupPassword" name="password" required 
+                           placeholder="أدخل كلمة مرور قوية" minlength="6">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-user-plus"></i> إنشاء حساب
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // التبديل بين تسجيل الدخول وإنشاء حساب
+        function switchTab(tab) {
+            const signinForm = document.getElementById('signinForm');
+            const signupForm = document.getElementById('signupForm');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            
+            // إخفاء الرسائل
+            hideMessages();
+            
+            if (tab === 'signin') {
+                signinForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                tabButtons[0].classList.add('active');
+                tabButtons[1].classList.remove('active');
+            } else {
+                signinForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                tabButtons[0].classList.remove('active');
+                tabButtons[1].classList.add('active');
+            }
+        }
+
+        // إخفاء الرسائل
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // عرض رسالة خطأ
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // عرض رسالة نجاح
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // عرض/إخفاء حالة التحميل
+        function toggleLoading(show) {
+            const loading = document.getElementById('loading');
+            const forms = document.querySelectorAll('.auth-form');
+            const buttons = document.querySelectorAll('.submit-btn');
+            
+            if (show) {
+                loading.style.display = 'block';
+                forms.forEach(form => form.style.opacity = '0.5');
+                buttons.forEach(btn => btn.disabled = true);
+            } else {
+                loading.style.display = 'none';
+                forms.forEach(form => form.style.opacity = '1');
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        // تسجيل الدخول
+        document.getElementById('signinForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('signinEmail').value;
+            const password = document.getElementById('signinPassword').value;
+            
+            if (!email || !password) {
+                showError('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            toggleLoading(true);
+            hideMessages();
+            
+            try {
+                const response = await fetch('/api/auth/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    if (data.access_token) {
+                        // حفظ بيانات المصادقة
+                        localStorage.setItem('access_token', data.access_token);
+                        localStorage.setItem('user_email', data.email);
+                        localStorage.setItem('user_name', data.full_name || '');
+                        localStorage.setItem('user_data', JSON.stringify(data));
+                        
+                        showSuccess('تم تسجيل الدخول بنجاح! جاري التوجيه...');
+                        
+                        // توجيه للصفحة الرئيسية بعد ثانيتين
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 2000);
+                    } else {
+                        showError('فشل في الحصول على رمز المصادقة');
+                    }
+                } else {
+                    showError(data.detail || 'فشل في تسجيل الدخول');
+                }
+            } catch (error) {
+                console.error('خطأ في تسجيل الدخول:', error);
+                showError('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        // إنشاء حساب
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const full_name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            if (!full_name || !email || !password) {
+                showError('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                return;
+            }
+            
+            toggleLoading(true);
+            hideMessages();
+            
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, full_name })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showSuccess('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.');
+                    
+                    // التبديل إلى تسجيل الدخول بعد ثانيتين
+                    setTimeout(() => {
+                        switchTab('signin');
+                        document.getElementById('signinEmail').value = email;
+                    }, 2000);
+                } else {
+                    showError(data.detail || 'فشل في إنشاء الحساب');
+                }
+            } catch (error) {
+                console.error('خطأ في إنشاء الحساب:', error);
+                showError('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        // التحقق من وجود توكن عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                // المستخدم مسجل دخول بالفعل، توجيهه للصفحة الرئيسية
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>

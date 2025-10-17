@@ -1,0 +1,16 @@
+{
+  "name": "Friday - English Learning AI",
+  "short_name": "Friday AI",
+  "description": "تعلم اللغة الإنجليزية مع مساعد AI الصوتي",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "lang": "ar",
+  "dir": "rtl"
+}
