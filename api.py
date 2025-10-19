@@ -200,7 +200,9 @@ def _stop_agent_worker() -> None:
 
 @app.on_event("startup")
 async def _on_startup():
-    _spawn_agent_worker()
+    # Agent يعمل على VPS فقط - معطل على Railway
+    # _spawn_agent_worker()
+    pass
 
 @app.on_event("shutdown")
 async def _on_shutdown():
