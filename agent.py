@@ -7,9 +7,6 @@ from dotenv import load_dotenv
 
 from livekit import agents
 from livekit.agents import AgentSession, Agent, RoomInputOptions, ChatContext
-from livekit.plugins import (
-    noise_cancellation,
-)
 from livekit.plugins import google
 from prompts import AGENT_INSTRUCTION, SESSION_INSTRUCTION, SENTENCES_TEACHING_PROMPT, ENGLISH_CONVERSATION_PROMPT
 from tools import get_weather, search_web, send_email
@@ -1439,13 +1436,13 @@ async def entrypoint(ctx: agents.JobContext):
                     print(f"[agent] تم تنظيف قائمة الجمل من {len(assistant.sentences_progress.get('generated_sentences', []))} إلى {len(generated_sentences)}")
                 
                 # عدم عرض الجمل القديمة - بدء بجمل جديدة مباشرة
-                welcome_message += f"Welcome back! لقد تعلمت {completed} جملة في الجلسات السابقة. You're at level {current_level}!  "
-                welcome_message += "Let's continue with new sentences! لنبدأ بجمل جديدة...  "
+                welcome_message += f"Welcome back! لقد تعلمت {completed} جملة في الجلسات السابقة. You're at level {current_level}!"
+                welcome_message += "Let's continue with new sentences! لنبدأ بجمل جديدة..."
             else:
                 # اكتمال جميع الجمل الموجودة
                 total_learned = len(learned_history)
-                welcome_message += f"Welcome back! Great progress! لقد أكملت {total_learned} جملة. You're at level {current_level}!  "
-                welcome_message += "Let's learn new sentences today! لنتعلم جمل جديدة...  "
+                welcome_message += f"Welcome back! Great progress! لقد أكملت {total_learned} جملة. You're at level {current_level}!"
+                welcome_message += "Let's learn new sentences today! لنتعلم جمل جديدة..."
         else:
             welcome_message += "اليوم سنتعلم معاً جمل إنجليزية بسيطة ومفيدة. سأولد لك مجموعة من الجمل، وأعلمك كل جملة، وأطلب منك تكرارها. يمكنك طلب المزيد من الجمل في أي وقت!\n\n"
             welcome_message += "هل أنت جاهز لنبدأ بالجملة الأولى؟"
@@ -1469,8 +1466,8 @@ async def entrypoint(ctx: agents.JobContext):
             if conversation_history:
                 # الحصول على آخر جلسة
                 # عدم عرض الجمل القديمة - بدء بجمل جديدة مباشرة
-                welcome_message += f" أهلاً بعودتك! لقد تعلمت {words_learned} كلمة حتى الآن.  "
-                welcome_message += "هل تريد: 1. متابعة من حيث توقفنا 2. أم بدء موضوع جديد  قل لي 'متابعة' أو 'موضوع جديد'."
+                welcome_message += f" أهلاً بعودتك! لقد تعلمت {words_learned} كلمة حتى الآن."
+                welcome_message += "هل تريد:1. متابعة من حيث توقفنا2. أم بدء موضوع جديدقل لي 'متابعة' أو 'موضوع جديد'."
         else:
             welcome_message += " مرحباً بك! سنبدأ رحلة تعلم الإنجليزية مع موضوع الأسماء (Nouns)."
 
