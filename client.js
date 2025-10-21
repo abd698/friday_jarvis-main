@@ -52,7 +52,8 @@ class SCIVoiceClient {
       'joinBtn', 'leaveBtn', 'room', 'name', 'signoutBtn', 'userInfo',
       'chatMessages', 'typingIndicator', 'liveTranscription', 
       'transcriptionText', 'transcriptionIndicator', 'sentences3000Btn', 'podcastBtn',
-      'feedbackCard', 'starRating', 'feedbackText', 'submitFeedbackBtn', 'skipFeedbackBtn', 'feedbackSuccess'
+      'feedbackCard', 'starRating', 'feedbackText', 'submitFeedbackBtn', 'skipFeedbackBtn', 'feedbackSuccess',
+      'connectionLoader'
     ];
     
     elementIds.forEach(id => {
@@ -447,6 +448,9 @@ class SCIVoiceClient {
   // === وظائف الاتصال ===
   async join() {
     try {
+      // 🔄 إظهار مؤشر التحميل
+      if (this.elements.connectionLoader) this.elements.connectionLoader.style.display = 'flex';
+      
       if (this.elements.joinBtn) this.elements.joinBtn.disabled = true;
       if (this.elements.leaveBtn) this.elements.leaveBtn.disabled = false;
 
@@ -507,6 +511,9 @@ class SCIVoiceClient {
         await mic.unmute();
         this.log('🎵 تم إلغاء كتم الميكروفون', 'ok');
       }
+      
+      // ✅ إخفاف مؤشر التحميل بعد النجاح
+      if (this.elements.connectionLoader) this.elements.connectionLoader.style.display = 'none';
     } catch (e) {
       console.error('[join error]', e);
       
@@ -529,6 +536,9 @@ class SCIVoiceClient {
           console.error('[disconnect error]', disconnectErr);
         }
       }
+      
+      // ❗ إخفاء المؤشر في حالة الخطأ
+      if (this.elements.connectionLoader) this.elements.connectionLoader.style.display = 'none';
       
       if (this.elements.joinBtn) this.elements.joinBtn.disabled = false;
       if (this.elements.leaveBtn) this.elements.leaveBtn.disabled = true;
