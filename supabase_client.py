@@ -305,6 +305,8 @@ class SupabaseManager:
     async def create_user_progress(self, user_id: str) -> Dict[str, Any]:
         """إنشاء سجل تقدم جديد للمستخدم"""
         try:
+            logger.info(f"📂 جارٍ إنشاء سجل user_progress لـ: {user_id}")
+            
             progress_data = {
                 "user_id": user_id,
                 "words_learned": 0,
@@ -320,11 +322,19 @@ class SupabaseManager:
                 "updated_at": datetime.now().isoformat()
             }
             
-            # استخدام service client للتجاوز RLS عند الحاجة
+            # استخدام service client للتجاوز RLS
             client = self.service_client if self.service_client else self.client
+            client_type = "service_client" if self.service_client else "regular_client"
+            logger.info(f"🔑 استخدام: {client_type}")
+            
             result = client.table("user_progress").insert(progress_data).execute()
-            logger.info(f"تم إنشاء سجل تقدم جديد للمستخدم: {user_id}")
-            return {"success": True, "progress": result.data[0] if result.data else None}
+            
+            if result.data:
+                logger.info(f"✅ تم إنشاء user_progress بنجاح: {user_id}")
+                return {"success": True, "progress": result.data[0]}
+            else:
+                logger.warning(f"⚠️ لم يرجع data بعد insert!")
+                return {"success": False, "progress": None}
             
         except Exception as e:
             logger.error(f"خطأ في إنشاء سجل التقدم: {e}")
@@ -492,16 +502,19 @@ class SupabaseManager:
             # استخدام service_client إذا كان متاحاً لتجاوز RLS
             client = self.service_client if self.service_client else self.client
             
+            logger.info(f"💾 جارٍ تحديث user_progress لـ {user_id} باستخدام {client}")
+            logger.info(f"📊 البيانات: {update_data}")
+            
             response = client.table("user_progress").update(update_data).eq("user_id", user_id).execute()
             
             if response.data:
-                logger.info(f"تم تحديث تقدم المستخدم: {user_id}")
+                logger.info(f"✅ تم تحديث user_progress بنجاح: {user_id}")
                 return {
                     "success": True,
                     "progress": response.data[0]
                 }
             else:
-                logger.warning(f"لم يتم العثور على تقدم للمستخدم: {user_id}")
+                logger.warning(f"⚠️ لم يتم العثور على تقدم للمستخدم: {user_id}")
                 return {"success": False, "error": "لم يتم العثور على تقدم المستخدم"}
                 
         except Exception as e:

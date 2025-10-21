@@ -687,20 +687,25 @@ USE THIS INFORMATION TO CREATE PERSONALIZED, REAL-LIFE EXAMPLES!
         
         try:
             # تحميل صامت للبيانات بدون طباعة لتسريع البداية
+            print(f"[LOAD] 📂 جارٍ تحميل تقدم المستخدم: {self.user_id}")
             self.user_progress = await supabase_manager.get_or_create_user_progress(self.user_id)
             
-            # تحديث سياق المحادثة بالذاكرة فقط (بدون تطبيق البيانات على الجلسة الحالية)
             if self.user_progress:
-                memory_context = self._build_memory_context()
+                print(f"[LOAD] ✅ تم تحميل التقدم: {self.user_progress.get('words_learned', 0)} كلمة")
                 
-                # إنشاء نسخة جديدة من السياق وتحديثها
+                # تحديث سياق المحادثة بالذاكرة
+                memory_context = self._build_memory_context()
                 new_ctx = self.chat_ctx.copy()
                 new_ctx.add_message(role="system", content=memory_context)
                 await self.update_chat_ctx(new_ctx)
+            else:
+                print(f"[LOAD] ⚠️ لم يتم تحميل أي تقدم - سيتم إنشاء سجل جديد")
                 
         except Exception as e:
-            # تجاهل الأخطاء بصمت لتسريع البداية
-            pass
+            # تسجيل الخطأ لمعرفة سبب فشل تحميل user_progress
+            print(f"[LOAD] ❌ خطأ في تحميل user_progress: {str(e)}")
+            import traceback
+            print(f"[LOAD] 🐞 Traceback: {traceback.format_exc()}")
     
     def _build_memory_context(self) -> str:
         """بناء سياق الذاكرة للمحادثة - يدعم الوضع العادي ووضع تعليم الجمل"""
@@ -866,17 +871,26 @@ CRITICAL INSTRUCTIONS FOR RETURNING USER:
             
             # فحص وجود بيانات للحفظ
             if current_words_count > 0 or current_topic or last_position:
-                await supabase_manager.update_user_progress(
+                print(f"[SAVE] 💾 جارٍ حفظ التقدم: user_id={self.user_id}")
+                
+                result = await supabase_manager.update_user_progress(
                     user_id=self.user_id,
-                    current_topic=current_topic or "General",  # موضوع افتراضي
-                    last_position=last_position or "In progress",  # موضع افتراضي
-                    progress_percentage=min(100, current_words_count * 2)  # كل كلمة = 2%
+                    current_topic=current_topic or "General",
+                    last_position=last_position or "In progress",
+                    progress_percentage=min(100, current_words_count * 2)
                 )
-                # رسالة تشخيصية
-                print(f"[SAVE] ✅ حفظ التقدم: الموضوع={current_topic or 'N/A'}, الموضع={last_position or 'N/A'}, الكلمات={current_words_count}")
+                
+                if result:
+                    print(f"[SAVE] ✅ تم حفظ التقدم: موضوع={current_topic or 'N/A'}, موضع={last_position or 'N/A'}, كلمات={current_words_count}")
+                else:
+                    print(f"[SAVE] ⚠️ فشل حفظ التقدم - لم يرجع result")
+            else:
+                print(f"[SAVE] ⚠️ لا توجد بيانات للحفظ (words={current_words_count}, topic={current_topic}, position={last_position})")
             
         except Exception as e:
-            pass  # تجاهل الأخطاء
+            print(f"[SAVE] ❌ خطأ في حفظ التقدم: {str(e)}")
+            import traceback
+            print(f"[SAVE] 🐞 Traceback: {traceback.format_exc()}")
     
     async def save_podcast_progress(self, topic: str = "", words_discussed: list = None, last_position: str = "", session_summary: str = ""):
         """حفظ تقدم محادثة البودكاست في قاعدة البيانات المنفصلة"""
