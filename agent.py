@@ -1366,7 +1366,6 @@ async def entrypoint(ctx: agents.JobContext):
             # - If self-hosting, omit this parameter
             # - For telephony applications, use `BVCTelephony` for best results
             video_enabled=True,
-            noise_cancellation=noise_cancellation.BVC(),
         ),
     )
     print("[agent] session started")
