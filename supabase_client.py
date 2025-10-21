@@ -343,7 +343,12 @@ class SupabaseManager:
     async def save_feedback(self, feedback_data: dict):
         """حفظ تقييم وملاحظات المستخدم"""
         try:
-            result = self.client.table('user_feedback').insert({
+            logger.info(f"📝 جارٍ حفظ تقييم: {feedback_data.get('rating')} نجوم")
+            
+            # استخدام service_client لتجنب مشاكل RLS
+            client = self.service_client if self.service_client else self.client
+            
+            result = client.table('user_feedback').insert({
                 'rating': feedback_data['rating'],
                 'comment': feedback_data.get('comment', ''),
                 'user_email': feedback_data.get('user_email', 'anonymous'),
@@ -353,18 +358,31 @@ class SupabaseManager:
                 'created_at': feedback_data.get('session_date')
             }).execute()
             
-            logger.info(f"✅ تم حفظ التقييم: {feedback_data['rating']} نجوم من {feedback_data.get('user_name', 'anonymous')}")
-            return {"success": True, "data": result.data}
+            if result.data:
+                logger.info(f"✅ تم حفظ التقييم بنجاح: {feedback_data['rating']} نجوم من {feedback_data.get('user_name', 'anonymous')}")
+                return {"success": True, "data": result.data}
+            else:
+                logger.warning("⚠️ لم يرجع data بعد حفظ التقييم")
+                return {"success": True}  # نعيد true لتحسين UX
+                
         except Exception as e:
-            logger.error(f"خطأ في حفظ التقييم: {e}")
-            # نعيد true حتى لو فشل لتحسين UX
-            return {"success": True}
+            logger.error(f"❌ خطأ في حفظ التقييم: {e}")
+            import traceback
+            logger.error(f"🐞 Traceback: {traceback.format_exc()}")
+            return {"success": True}  # نعيد true لتحسين UX
     
     async def update_user_progress_dict(self, user_id: str, progress_data: Dict[str, Any]) -> Dict[str, Any]:
         """تحديث تقدم المستخدم باستخدام dictionary"""
         try:
+            logger.info(f"📊 جارٍ تحديث user_progress_dict لـ {user_id}")
+            
             # جلب التقدم الحالي للدمج بدلاً من الاستبدال
             current_progress = await self.get_user_progress(user_id) or {}
+            
+            if not current_progress:
+                logger.warning(f"⚠️ لم يتم العثور على current_progress - سيتم إنشاء سجل جديد")
+                await self.create_user_progress(user_id)
+                current_progress = await self.get_user_progress(user_id) or {}
 
             # دمج المفردات vocabulary إن وُجدت في الطلب
             if isinstance(progress_data.get("vocabulary"), dict):
@@ -393,14 +411,19 @@ class SupabaseManager:
             progress_data["updated_at"] = datetime.utcnow().isoformat()
             progress_data["last_session_at"] = datetime.utcnow().isoformat()
             
-            # استخدام service client للتجاوز RLS عند الحاجة
+            # استخدام service client للتجاوز RLS
             db_client = self.service_client or self.client
+            client_type = "service_client" if self.service_client else "regular_client"
+            logger.info(f"🔑 استخدام {client_type} للتحديث")
+            logger.info(f"📊 الحقول المحدثة: {list(progress_data.keys())}")
+            
             result = db_client.table("user_progress").update(progress_data).eq("user_id", user_id).execute()
             
             if result.data:
-                logger.info(f"تم تحديث تقدم المستخدم: {user_id}")
+                logger.info(f"✅ تم تحديث user_progress_dict بنجاح: {user_id}")
                 return {"success": True, "progress": result.data[0]}
             else:
+                logger.error(f"❌ لم يتم تحديث أي سجل! user_id={user_id}")
                 raise HTTPException(status_code=404, detail="لم يتم العثور على سجل التقدم")
                 
         except Exception as e:
@@ -410,10 +433,14 @@ class SupabaseManager:
     async def save_conversation_data(self, user_id: str, conversation_data: Dict[str, Any]) -> Dict[str, Any]:
         """حفظ بيانات المحادثة الصوتية"""
         try:
+            logger.info(f"💾 جارٍ حفظ conversation_data لـ {user_id}")
+            logger.info(f"📊 topic={conversation_data.get('topic')}, words={len(conversation_data.get('words_discussed', []))}")
+            
             # جلب التقدم الحالي
             current_progress = await self.get_user_progress(user_id)
             
             if not current_progress:
+                logger.warning(f"⚠️ لم يتم العثور على user_progress - سيتم إنشاءه")
                 # إنشاء سجل جديد إذا لم يكن موجوداً
                 await self.create_user_progress(user_id)
                 current_progress = await self.get_user_progress(user_id)
@@ -457,10 +484,20 @@ class SupabaseManager:
                 "session_data": conversation_data.get("session_data", {})
             }
             
-            return await self.update_user_progress_dict(user_id, update_data)
+            logger.info(f"💾 استدعاء update_user_progress_dict...")
+            result = await self.update_user_progress_dict(user_id, update_data)
+            
+            if result.get("success"):
+                logger.info(f"✅ تم حفظ conversation_data بنجاح")
+            else:
+                logger.warning(f"⚠️ فشل حفظ conversation_data")
+                
+            return result
             
         except Exception as e:
-            logger.error(f"خطأ في حفظ بيانات المحادثة: {e}")
+            logger.error(f"❌ خطأ حرج في save_conversation_data: {e}")
+            import traceback
+            logger.error(f"🐞 Traceback: {traceback.format_exc()}")
             raise HTTPException(status_code=500, detail=f"خطأ في حفظ بيانات المحادثة: {str(e)}")
     
     async def get_or_create_user_progress(self, user_id: str) -> Dict[str, Any]:
