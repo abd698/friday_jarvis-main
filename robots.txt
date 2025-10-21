@@ -1,0 +1,23 @@
+# robots.txt for Friday AI - معلم إنجليزي شخصي
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /.env
+Disallow: /__pycache__/
+
+# Sitemap
+Sitemap: https://www.fridayaia.com/sitemap.xml
+
+# Search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Crawl delay
+Crawl-delay: 1
