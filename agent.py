@@ -54,7 +54,6 @@ class Assistant(Agent):
             llm=google.beta.realtime.RealtimeModel(
                 voice=voice_name,
                 temperature=0.8,
-                speech_config={"rate": 0.6},  # تبطيء الكلام إلى 60% للمتعلمين - أبطأ وأوضح
             ),
             tools=[
                 get_weather,
