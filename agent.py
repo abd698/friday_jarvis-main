@@ -48,7 +48,7 @@ class Assistant(Agent):
         
         print(f"🎤 استخدام صوت: {voice_name}")
             
-        super().__init__(
+        super().__init__( 
             chat_ctx=chat_ctx,
             instructions=instructions,
             llm=google.beta.realtime.RealtimeModel(
