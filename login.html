@@ -290,8 +290,8 @@
         <!-- قسم تسجيل الدخول -->
         <div class="auth-section">
             <div class="auth-tabs">
-                <button class="tab-button active" onclick="switchTab('signin')">تسجيل الدخول</button>
-                <button class="tab-button" onclick="switchTab('signup')">إنشاء حساب</button>
+                <button class="tab-button" onclick="switchTab('signin')">تسجيل الدخول</button>
+                <button class="tab-button active" onclick="switchTab('signup')">إنشاء حساب</button>
             </div>
 
             <div class="error-message" id="errorMessage"></div>
@@ -302,7 +302,7 @@
             </div>
 
             <!-- نموذج تسجيل الدخول -->
-            <form id="signinForm" class="auth-form">
+            <form id="signinForm" class="auth-form hidden">
                 <div class="form-group">
                     <label for="signinEmail">البريد الإلكتروني</label>
                     <input type="email" id="signinEmail" name="email" required 
@@ -319,7 +319,7 @@
             </form>
 
             <!-- نموذج إنشاء حساب -->
-            <form id="signupForm" class="auth-form hidden">
+            <form id="signupForm" class="auth-form">
                 <div class="form-group">
                     <label for="signupName">الاسم الكامل</label>
                     <input type="text" id="signupName" name="full_name" required 
