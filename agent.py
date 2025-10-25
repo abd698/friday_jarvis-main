@@ -201,17 +201,23 @@ class Assistant(Agent):
             
         try:
             # البحث عن الجمل الإنجليزية المُولدة في الرد
-            # نبحث عن أنماط مثل: "1. **I am happy.**" أو "**I am happy.**"
+            # أنماط محسّنة ومتعددة لاستخراج الجمل
             sentence_patterns = [
                 r'\*\*([A-Z][^*]+\.)\*\*',  # **I am happy.**
                 r'[\d]+\.\s*\*\*([A-Z][^*]+\.)\*\*',  # 1. **I am happy.**
                 r'"([A-Z][^"]+\.)"',  # "I am happy."
+                r':\s+([A-Z][^.!?]+[.!?])',  # : I am happy.
+                r'الجملة:\s*([A-Z][^.!?]+[.!?])',  # الجملة: I am happy.
+                r'sentence:\s*([A-Z][^.!?]+[.!?])',  # sentence: I am happy.
+                r'^([A-Z][^.!?]+[.!?])$',  # I am happy. (سطر كامل)
             ]
             
             found_sentences = []
             for pattern in sentence_patterns:
-                matches = re.findall(pattern, agent_text)
-                found_sentences.extend(matches)
+                matches = re.findall(pattern, agent_text, re.MULTILINE)
+                if matches:
+                    found_sentences.extend(matches)
+                    print(f"[agent] 🔍 Pattern matched: {pattern[:30]}... → {len(matches)} جملة")
             
             # حفظ الجمل المُولدة إذا وُجدت
             if found_sentences:
@@ -220,21 +226,27 @@ class Assistant(Agent):
                     self.current_sentences = []
                 
                 # مقارنة دقيقة للجمل - تنظيف الجمل للمقارنة الصحيحة
-                normalized_current = [s.lower().replace('.', '').replace(',', '').strip() for s in self.current_sentences]
+                normalized_current = [s.lower().replace('.', '').replace(',', '').replace('!', '').replace('?', '').strip() for s in self.current_sentences]
                 
                 new_sentences = []
                 for sentence in found_sentences:
                     clean_sentence = sentence.strip()
-                    normalized_new = clean_sentence.lower().replace('.', '').replace(',', '').strip()
+                    # تنظيف الجملة من رموز markdown وغيرها
+                    clean_sentence = clean_sentence.replace('*', '').replace('_', '').strip()
+                    normalized_new = clean_sentence.lower().replace('.', '').replace(',', '').replace('!', '').replace('?', '').strip()
                     
-                    # تحقق من عدم وجود الجملة مسبقاً (مقارنة بالنص المنظف)
-                    if normalized_new not in normalized_current and clean_sentence:
+                    # تحقق من عدم وجود الجملة مسبقاً وأنها جملة صحيحة
+                    if (normalized_new not in normalized_current and 
+                        clean_sentence and 
+                        len(clean_sentence) > 5 and  # على الأقل 5 أحرف
+                        not clean_sentence.startswith('(')):  # تجنب النص بين أقواس
                         new_sentences.append(clean_sentence)
-                        normalized_current.append(normalized_new)  # إضافة للمقارنة اللاحقة
+                        normalized_current.append(normalized_new)
+                        print(f"[agent] ➕ جملة جديدة: {clean_sentence}")
                 
                 if new_sentences:
                     self.current_sentences.extend(new_sentences)
-                    # إضافة الجمل الجديدة لتاريخ التعلم (مع التحقق من وجوده)
+                    # إضافة الجمل الجديدة لتاريخ التعلم
                     if not hasattr(self, 'learned_sentences_history'):
                         self.learned_sentences_history = []
                     self.learned_sentences_history.extend(new_sentences)
@@ -249,9 +261,12 @@ class Assistant(Agent):
                         learned_sentences_history=self.learned_sentences_history
                     )
                     print(f"[agent] 💾 تم حفظ {len(new_sentences)} جملة جديدة (المستوى {self.current_level}). إجمالي: {len(self.current_sentences)} جملة")
+                    print(f"[agent] 💾 حفظ في قاعدة البيانات - learned_sentences_history: {len(self.learned_sentences_history)} جملة")
                     print(f"[agent] ✨ الجمل الجديدة: {new_sentences}")
                 else:
-                    print(f"[agent] تم تجاهل {len(found_sentences)} جملة مكررة: {found_sentences}")
+                    print(f"[agent] ⚠️ تم تجاهل {len(found_sentences)} جملة (مكررة أو غير صالحة)")
+            else:
+                print(f"[agent] ⚠️ لم يتم العثور على جمل في النص: {agent_text[:100]}...")
             
             # البحث عن إشارات إكمال جملة
             completion_indicators = [
@@ -261,10 +276,25 @@ class Assistant(Agent):
             if any(indicator in agent_text.lower() for indicator in completion_indicators):
                 # زيادة عدد الجمل المُكتملة
                 self.sentences_completed = getattr(self, 'sentences_completed', 0) + 1
-                # تحديث current_sentence_index للجملة التالية (يجب أن يساوي sentences_completed)
+                # تحديث current_sentence_index للجملة التالية
                 self.current_sentence_index = self.sentences_completed
                 
-                print(f"[agent] جملة مكتملة! العدد المكتمل: {self.sentences_completed}, المؤشر التالي: {self.current_sentence_index}")
+                print(f"[agent] ✅ جملة مكتملة! العدد المكتمل: {self.sentences_completed}, المؤشر التالي: {self.current_sentence_index}")
+                
+                # 🆕 حفظ الجملة الحالية في التاريخ (إذا لم تُحفظ بعد)
+                if hasattr(self, 'current_sentences') and self.current_sentences:
+                    current_sentence_index_for_save = min(self.current_sentence_index - 1, len(self.current_sentences) - 1)
+                    if current_sentence_index_for_save >= 0:
+                        current_sentence = self.current_sentences[current_sentence_index_for_save]
+                        
+                        # التأكد من وجود learned_sentences_history
+                        if not hasattr(self, 'learned_sentences_history'):
+                            self.learned_sentences_history = []
+                        
+                        # إضافة الجملة إلى التاريخ إذا لم تكن موجودة
+                        if current_sentence and current_sentence not in self.learned_sentences_history:
+                            self.learned_sentences_history.append(current_sentence)
+                            print(f"[agent] 📝 أضيفت الجملة المكتملة للتاريخ: {current_sentence}")
                 
                 # حفظ التقدم الجديد مع العدد الإجمالي الصحيح
                 current_total = len(getattr(self, 'current_sentences', []))
@@ -277,17 +307,22 @@ class Assistant(Agent):
                     self.current_level += 1
                     print(f"[agent] 🎉 مبروك! الانتقال للمستوى {self.current_level} - أكملت {self.sentences_completed} جملة!")
                 
+                # حفظ التقدم في قاعدة البيانات
+                learned_history = getattr(self, 'learned_sentences_history', [])
+                print(f"[agent] 💾 حفظ التقدم - completed: {self.sentences_completed}, history: {len(learned_history)} جمل")
+                
                 await supabase_manager.update_sentences_progress(
                     self.user_id,
                     self.sentences_session_id,
                     completed_sentences=self.sentences_completed,
                     current_sentence_index=self.current_sentence_index,
-                    generated_sentences=self.current_sentences,  # ✅ إضافة الجمل المُنشأة
+                    generated_sentences=self.current_sentences,
                     total_sentences=current_total,
                     current_level=self.current_level,
-                    learned_sentences_history=getattr(self, 'learned_sentences_history', [])
+                    learned_sentences_history=learned_history
                 )
                 print(f"[agent] ✅ تم تحديث التقدم: {self.sentences_completed}/{current_total} جملة مُكتملة (المستوى {self.current_level})")
+                print(f"[agent] 📊 التاريخ: {len(learned_history)} جملة في learned_sentences_history")
                 
         except Exception as e:
             print(f"[agent] خطأ في معالجة رد الجمل: {e}")
