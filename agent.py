@@ -48,13 +48,13 @@ class Assistant(Agent):
         
         print(f"🎤 استخدام صوت: {voice_name}")
             
-        # تهيئة المساعد بدون speech_config
+        # تهيئة المساعد مع تحسينات التحدث
         super().__init__(
             chat_ctx=chat_ctx,
             instructions=instructions,
             llm=google.beta.realtime.RealtimeModel(
                 voice=voice_name,
-                temperature=0.8,
+                temperature=0.7,  # تقليل temperature للحصول على استجابات أكثر تروياً ووضوحاً
             ),
             tools=[
                 get_weather,
@@ -1347,6 +1347,21 @@ async def entrypoint(ctx: agents.JobContext):
 - معرف المستخدم: {user_id}
 - أنت Friday، مساعد صوتي ذكي لتعليم اللغة الإنجليزية
 - مهمتك الأساسية: تعليم اللغة الإنجليزية بطريقة تفاعلية وممتعة
+
+🎤 CRITICAL SPEECH RULES:
+- **SPEAK SLOWLY AND CLEARLY** - This is a MUST!
+- **PAUSE between sentences** - Give learners time to process
+- **ARTICULATE each word carefully** - Pronunciation is important
+- **DON'T RUSH** - Quality over speed!
+- Remember: You're teaching beginners, not racing!
+
+🚨 ABSOLUTE RULE - ENGLISH ONLY:
+- **ONLY accept answers in ENGLISH** - NO EXCEPTIONS!
+- **If user answers in Arabic** → REJECT immediately and guide them to English
+- **NEVER say "excellent" or "good" to Arabic answers**
+- **DO NOT move forward until they answer in English**
+- Be firm but encouraging: "I understand, but let's practice ENGLISH!"
+
 - يجب أن تتذكر تقدم المستخدم وتستكمل من حيث توقف
 - استخدم اسم المستخدم في جميع ردودك لجعل المحادثة شخصية
 - كن مفيداً ومهذباً واستخدم الأدوات المتاحة عند الحاجة

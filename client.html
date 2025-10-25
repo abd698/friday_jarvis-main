@@ -55,6 +55,70 @@
     <link rel="stylesheet" href="client.css">
 </head>
 <body>
+    <!-- 🎧 Modal الترحيب ونصيحة سماعات الرأس -->
+    <div id="welcomeModal" class="modal-overlay">
+        <div class="modal-content welcome-modal">
+            <div class="modal-header">
+                <div class="welcome-icon">🎉</div>
+                <h2>مرحباً بك في Friday AI!</h2>
+                <p class="welcome-subtitle">معلمك الشخصي لتعلم الإنجليزية</p>
+            </div>
+            
+            <div class="modal-body">
+                <!-- نصيحة سماعات الرأس -->
+                <div class="tip-box headphone-tip">
+                    <div class="tip-icon">🎧</div>
+                    <div class="tip-content">
+                        <h3>نصيحة مهمة للحصول على أفضل تجربة!</h3>
+                        <p>استخدم <strong>سماعات الرأس (هيدفون)</strong> للحصول على:</p>
+                        <ul class="tip-list">
+                            <li>✅ صوت واضح بدون تشويش أو صدى</li>
+                            <li>✅ تجربة تعليمية أفضل وأكثر تركيزاً</li>
+                            <li>✅ تفاعل أسرع وأدق مع المعلم الذكي</li>
+                            <li>✅ حماية خصوصيتك أثناء التعلم</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- نصائح سريعة -->
+                <div class="quick-tips">
+                    <h3>💡 نصائح سريعة للبدء:</h3>
+                    <div class="tips-grid">
+                        <div class="tip-item">
+                            <span class="tip-emoji">🎤</span>
+                            <p>تحدث بوضوح وببطء</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-emoji">🗣️</span>
+                            <p>استخدم الإنجليزية فقط</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-emoji">📚</span>
+                            <p>تدرب يومياً 15 دقيقة</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-emoji">💪</span>
+                            <p>لا تخف من الأخطاء</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- تذكير -->
+                <div class="reminder-box">
+                    <input type="checkbox" id="dontShowAgain">
+                    <label for="dontShowAgain">لا تظهر هذه الرسالة مرة أخرى</label>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button id="startLearningBtn" class="btn btn-primary btn-large">
+                    <i class="fas fa-rocket"></i>
+                    ابدأ التعلم الآن!
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- الحاوية الرئيسية -->
     <div class="main-container">
         <!-- القسم الرئيسي للتحكم -->
@@ -319,5 +383,50 @@
     
     <!-- عنصر الصوت المخفي -->
     <audio id="audio" autoplay playsinline style="display: none;"></audio>
+    
+    <!-- 🎯 Welcome Modal Script -->
+    <script>
+        // فحص إذا تم عرض الرسالة الترحيبية من قبل
+        function checkWelcomeModal() {
+            const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+            const welcomeModal = document.getElementById('welcomeModal');
+            
+            if (!hasSeenWelcome) {
+                // عرض الـ Modal
+                welcomeModal.style.display = 'flex';
+                
+                // منع التمرير في الخلفية
+                document.body.style.overflow = 'hidden';
+            } else {
+                welcomeModal.style.display = 'none';
+            }
+        }
+        
+        // زر البدء
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('startLearningBtn');
+            const dontShowCheckbox = document.getElementById('dontShowAgain');
+            const welcomeModal = document.getElementById('welcomeModal');
+            
+            if (startBtn) {
+                startBtn.addEventListener('click', function() {
+                    // حفظ الاختيار
+                    if (dontShowCheckbox && dontShowCheckbox.checked) {
+                        localStorage.setItem('hasSeenWelcome', 'true');
+                    }
+                    
+                    // إخفاء الـ Modal
+                    welcomeModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    
+                    // تأثير صوتي (اختياري)
+                    console.log('🚀 بدء رحلة التعلم!');
+                });
+            }
+            
+            // فحص عرض الرسالة الترحيبية
+            checkWelcomeModal();
+        });
+    </script>
 </body>
 </html>
